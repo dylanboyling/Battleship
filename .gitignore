@@ -11,6 +11,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .idea/
+*.iml
 
 ### Eclipse ###
 .apt_generated
@@ -39,5 +40,6 @@ bin/
 /idea
 idea/
 
-### Project Specific ###
-CST8211.iml
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+replay_pid*
