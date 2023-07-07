@@ -1,5 +1,7 @@
 package Game.Model;
 
+import Game.Model.Enums.GridSquareStatus;
+
 /**
  * Represents a square on the battleship grid
  */
@@ -14,44 +16,54 @@ public class GridSquare {
      */
     private final boolean isPlayer;
 
+    /**
+     * Size of the ship that this square belongs to
+     */
     private final int shipSize;
 
-
-
     /**
-     * does stuff
-     * @param shipSize
-     * @param isPlayer
-     * @param isAlive
+     * Creates a new grid square for the Battleship board
+     *
+     * @param shipSize Size of the ship that this square belongs to
+     * @param isPlayer True if the square belongs to the player, false otherwise
+     * @param isAlive  True if the square has not been hit yet, false if it has
      */
-    public GridSquare(int shipSize, boolean isPlayer, GridSquareStatus isAlive){
+    public GridSquare(int shipSize, boolean isPlayer, GridSquareStatus isAlive) {
         this.shipSize = shipSize;
         this.isPlayer = isPlayer;
         this.isAlive = isAlive;
     }
 
+    /**
+     * Gets the size of the ship this square belongs to
+     *
+     * @return Size of the ship this square belongs to
+     */
     public int getShipSize() {
         return shipSize;
     }
 
     /**
      * Returns the status of the ship part at this location. True if it is alive and false otherwise
+     *
      * @return Ship status on this grid square
      */
-    public GridSquareStatus isAlive(){
+    public GridSquareStatus isAlive() {
         return isAlive;
     }
 
     /**
      * Changes the status of the grid square
+     *
      * @param isAlive New status of the grid square
      */
-    public void setAlive(GridSquareStatus isAlive){
+    public void setAlive(GridSquareStatus isAlive) {
         this.isAlive = isAlive;
     }
 
     /**
      * Returns true if square belongs to the player, false if belongs to system
+     *
      * @return True if square belongs to player, false otherwise
      */
     public boolean isPlayer() {

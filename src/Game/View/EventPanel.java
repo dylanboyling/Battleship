@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * This class is displays the history log for guesses, option selections, and general info to the user
  */
-public class LogPanel extends JPanel {
+public class EventPanel extends JPanel {
 
     /**
      * Game log containing move history and various game information
@@ -17,7 +17,7 @@ public class LogPanel extends JPanel {
     /**
      * Initializes the window containing a scrollable text box for the game's history log
      */
-    public void initializePanel(){
+    public void initializePanel() {
         setLayout(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
@@ -36,9 +36,10 @@ public class LogPanel extends JPanel {
 
     /**
      * Updates the log window with a new entry
+     *
      * @param event New log entry to be added to the window
      */
-    public void updateLogPanel(final String event){
+    public void updateLogPanel(final String event) {
         textArea.append(event);
     }
 }
