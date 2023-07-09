@@ -12,22 +12,28 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * This class creates and initializes a grid of buttons used for a player's Battleship game board
+ */
 public class GridPanel extends JPanel {
+    /**
+     * Controller for the game which will process button clicks
+     */
     private final BattleshipController controller;
 
     /**
      * Default constructor for creating a GridPanel
      *
-     * @param controller
+     * @param controller Controller for the game which will process button clicks
      */
     public GridPanel(final BattleshipController controller) {
         this.controller = controller;
     }
 
     /**
-     * Initializes the game grid for ships
-     *
-     * @param boardState
+     * Initializes the panel representing a player's board
+     * @param gameState Current state of the game
+     * @param boardState Current state of the board being used to display the grid
      */
     public void initializePanel(final GameState gameState, final BoardState boardState) {
         GridSquare[][] grid = boardState.getGrid();
@@ -71,11 +77,12 @@ public class GridPanel extends JPanel {
                 }
 
                 if (gridSquare != null) {
-                    if (isPlayer && gridSquare.isAlive() == GridSquareStatus.ALIVE) {
+                    if (isPlayer && gridSquare.isAlive() == GridSquareStatus.ALIVE || gameStatus == GameStatus.GAME_OVER) {
                         gridButton.setText(Integer.toString(grid[row][col].getShipSize()));
                         gridButton.setBackground(Color.gray);
                         gridButton.setOpaque(true);
                         gridButton.setBorderPainted(false);
+                        gridButton.setEnabled(true); // enable to view ship size text on grid when in game over
                     } else if (gridSquare.isAlive() == GridSquareStatus.HIT) {
                         gridButton.setEnabled(false);
                         gridButton.setBackground(Color.red);
@@ -95,7 +102,8 @@ public class GridPanel extends JPanel {
             }
         }
 
-        final Border gridTitle = BorderFactory.createTitledBorder(isPlayer ? "Player" : "System");
+        final Border gridTitle = BorderFactory.createTitledBorder(isPlayer ?
+                Utils.getLocalizedString("player") : Utils.getLocalizedString("system"));
         setBorder(gridTitle);
     }
 

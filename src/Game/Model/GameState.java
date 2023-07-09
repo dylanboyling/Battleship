@@ -1,10 +1,12 @@
 package Game.Model;
 
 import Game.Model.Enums.GameStatus;
-import Game.Model.Enums.Language;
 
 import java.util.Random;
 
+/**
+ * This class represents the current state of the game and tracks turns, score, and current status/phase of the game
+ */
 public class GameState {
 
     /**
@@ -28,10 +30,8 @@ public class GameState {
     private GameStatus status;
 
     /**
-     * Current language that the game is being displayed in
+     * Creates a new GameState and randomly picks who goes first
      */
-    private Language language; // TODO figure out localization (1pt - low priority)
-
     public GameState(){
         Random coinFlip = new Random();
         isPlayersTurn = coinFlip.nextBoolean();
@@ -81,23 +81,5 @@ public class GameState {
     public void setStatus(GameStatus gameStatus) {
         System.out.println("[DEBUG] Game status is being set to " + gameStatus);
         this.status = gameStatus;
-    }
-
-    /**
-     * Gets language that the game is currently in
-     *
-     * @return Current game language
-     */
-    public Language getLanguage() {
-        return language;
-    }
-
-    /**
-     * Changes the language of the game to another one
-     *
-     * @param language New language game is to be displayed in
-     */
-    public void setLanguage(final Language language) {
-        this.language = language;
     }
 }

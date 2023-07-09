@@ -3,12 +3,14 @@ package Game.View;
 import Game.Controller.BattleshipController;
 import Game.Model.DesignState;
 import Game.Model.Enums.GameStatus;
-import Game.Model.Enums.Language;
+import Game.Util.Constants;
+import Game.Util.Utils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Creates the options panel for the Battleship game
@@ -53,33 +55,31 @@ public class OptionsPanel extends JPanel {
      */
     private JPanel initializeConfigurationPanel() {
         // TODO make buttons look better i.e. not so small and make centered
+        final GameStatus gameStatus = controller.getGameState().getStatus();
         final JPanel configPanel = new JPanel();
         configPanel.setLayout(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
-        final GameStatus gameStatus = controller.getGameState().getStatus();
-
-
-        final JLabel languageLabel = new JLabel("Language: ");
-        final JComboBox<Language> languages = new JComboBox<>(Language.values());
+        final JLabel languageLabel = new JLabel(Utils.getLocalizedString("language"));
+        final JComboBox<Locale> languages = new JComboBox<>(Constants.supportedLocales);
         languages.addActionListener(e -> {
             System.out.printf("[DEBUG] Language was changed to %s%n", languages.getSelectedItem());
-            controller.changeLanguage((Language) languages.getSelectedItem());
+            controller.changeLanguage((Locale) languages.getSelectedItem());
         });
 
-        final JLabel dimensionLabel = new JLabel("Dimensions: ");
+        final JLabel dimensionLabel = new JLabel(Utils.getLocalizedString("dimensions"));
         final JComboBox<String> dimensions = new JComboBox<>(DIMENSION_OPTIONS);
-        final JButton randomizeShips = new JButton("Random");
-        final JButton designShips = new JButton("Design");
-        final JButton resetButton = new JButton("Reset");
-        final JButton playButton = new JButton("Play");
+        final JButton randomizeShips = new JButton(Utils.getLocalizedString("random"));
+        final JButton designShips = new JButton(Utils.getLocalizedString("design"));
+        final JButton resetButton = new JButton(Utils.getLocalizedString("reset"));
+        final JButton playButton = new JButton(Utils.getLocalizedString("play"));
 
-        if(gameStatus == GameStatus.IN_PROGRESS){
+        if(gameStatus == GameStatus.IN_PROGRESS || gameStatus == GameStatus.GAME_OVER){
             randomizeShips.setEnabled(false);
             designShips.setEnabled(false);
             resetButton.setEnabled(false);
             playButton.setEnabled(false);
-            dimensions.setEnabled(false); // TODO when game starts, this resets to index 0. fix?
+            dimensions.setEnabled(false);
         } else{
             dimensions.setSelectedIndex(controller.getDimension() / 2 - 1);
             dimensions.addActionListener(e -> {
@@ -127,7 +127,7 @@ public class OptionsPanel extends JPanel {
         layoutConstraints.gridy = 1;
         configPanel.add(secondRow, layoutConstraints);
 
-        Border optionsBorder = BorderFactory.createTitledBorder("Options");
+        Border optionsBorder = BorderFactory.createTitledBorder(Utils.getLocalizedString("options"));
         configPanel.setBorder(optionsBorder);
 
         return configPanel;
@@ -141,16 +141,17 @@ public class OptionsPanel extends JPanel {
         final JPanel designPanel = new JPanel();
         designPanel.setLayout(new BoxLayout(designPanel, BoxLayout.X_AXIS));
 
-        final JLabel boatSizeLabel = new JLabel("Boat Size: ");
+        final JLabel boatSizeLabel = new JLabel(Utils.getLocalizedString("boat_size"));
         ArrayList<Integer> boatSizeOptions = (ArrayList<Integer>) controller.getBoatSizeOptions();
         Integer[] sizeOptions = boatSizeOptions.toArray(new Integer[boatSizeOptions.size()]);
         final JComboBox<Integer> boatSizes = new JComboBox<>(sizeOptions);
 
-        final JLabel boatCountRemaining = new JLabel(String.format("Boats of size %d remaining: %d", (Integer) boatSizes.getSelectedItem(),
+        final JLabel boatCountRemaining = new JLabel(String.format(Utils.getLocalizedString("boats_remaining"),
+                (Integer) boatSizes.getSelectedItem(),
                 controller.getBoatsRemaining((Integer) boatSizes.getSelectedItem())));
         boatSizes.addActionListener(e -> {
             System.out.printf("[DEBUG] Boat size to be placed was changed to %s%n", boatSizes.getSelectedItem());
-            boatCountRemaining.setText(String.format("Boats of size %d remaining: %d", (Integer) boatSizes.getSelectedItem(),
+            boatCountRemaining.setText(String.format(Utils.getLocalizedString("boats_remaining"), (Integer) boatSizes.getSelectedItem(),
                 controller.getBoatsRemaining((Integer) boatSizes.getSelectedItem())));
             controller.setSelectedBoatSize((Integer) boatSizes.getSelectedItem());
         });
@@ -165,9 +166,9 @@ public class OptionsPanel extends JPanel {
 
         // TODO add boats remaining text
 
-        final JLabel directionLabel = new JLabel("Boat Size: ");
-        final JRadioButton horizontalButton = new JRadioButton("Horizontal");
-        final JRadioButton verticalButton = new JRadioButton("Vertical");
+        final JLabel directionLabel = new JLabel(Utils.getLocalizedString("boat_direction"));
+        final JRadioButton horizontalButton = new JRadioButton(Utils.getLocalizedString("horizontal"));
+        final JRadioButton verticalButton = new JRadioButton(Utils.getLocalizedString("vertical"));
         final ButtonGroup directionButtons = new ButtonGroup();
 
         final boolean HORIZONTAL = true;
@@ -182,7 +183,7 @@ public class OptionsPanel extends JPanel {
         directionButtons.add(verticalButton);
         horizontalButton.setSelected(true);
 
-        final JButton clearButton = new JButton("Clear Board");
+        final JButton clearButton = new JButton(Utils.getLocalizedString("clear_board"));
         clearButton.addActionListener(e -> {
             System.out.println("[DEBUG] User has cleared the board in design mode");
             controller.clearPlayerBoard();
@@ -195,7 +196,7 @@ public class OptionsPanel extends JPanel {
         designPanel.add(clearButton);
 
         designPanel.add(Box.createRigidArea(new Dimension(25, 0)));
-        Border designBorder = BorderFactory.createTitledBorder("Design");
+        Border designBorder = BorderFactory.createTitledBorder(Utils.getLocalizedString("design"));
         designPanel.setBorder(designBorder);
 
         return designPanel;

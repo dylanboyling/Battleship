@@ -1,5 +1,7 @@
 package Game.View;
 
+import Game.Util.Utils;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -25,7 +27,7 @@ public class EventPanel extends JPanel {
         textArea.setEditable(false);
         final JScrollPane scroll = new JScrollPane(textArea);
 
-        final Border scrollBorderTitle = BorderFactory.createTitledBorder("Game History");
+        final Border scrollBorderTitle = BorderFactory.createTitledBorder(Utils.getLocalizedString("game_history"));
         scroll.setBorder(scrollBorderTitle);
         layoutConstraints.fill = GridBagConstraints.BOTH;
         layoutConstraints.weightx = 1.0;

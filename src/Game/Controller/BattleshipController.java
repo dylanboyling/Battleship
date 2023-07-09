@@ -3,12 +3,13 @@ package Game.Controller;
 import Game.Model.BoardState;
 import Game.Model.DesignState;
 import Game.Model.Enums.GameStatus;
-import Game.Model.Enums.Language;
 import Game.Model.GameState;
 import Game.Util.Utils;
 import Game.View.MainPanel;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static Game.Util.Constants.DEFAULT_GRID_DIMENSION;
 
@@ -50,6 +51,7 @@ public class BattleshipController {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
+        Locale.setDefault(new Locale("en", "CA"));
         final BattleshipController controller = new BattleshipController();
         controller.configure();
     }
@@ -59,7 +61,6 @@ public class BattleshipController {
      */
     private void configure() {
         gameState = new GameState();
-        gameState.setLanguage(Language.ENGLISH);
         gameState.setStatus(GameStatus.DESIGN);
 
         playerBoardState = new BoardState(true);
@@ -89,7 +90,7 @@ public class BattleshipController {
             systemBoardState.randomizeShipLocations();
         }
         playerBoardState.reset();
-        mainWindow.updateLogPanel("User has reset the board");
+        mainWindow.updateLogPanel(Utils.getLocalizedString("user_reset"));
     }
 
     /**
@@ -98,7 +99,7 @@ public class BattleshipController {
     public void randomizePlayerShipLocations() {
         gameState.setStatus(GameStatus.RANDOM);
         playerBoardState.randomizeShipLocations();
-        mainWindow.updateLogPanel("User has randomized their ship locations");
+        mainWindow.updateLogPanel(Utils.getLocalizedString("user_randomize"));
     }
 
     /**
@@ -126,15 +127,17 @@ public class BattleshipController {
         final int boatSize = designState.getBoatSize();
 
         if(playerBoardState.numberOfBoatSizesRemaining(boatSize) == 0){
-            mainWindow.updateLogPanel("Error: You can not place any more boats of this size");
+            mainWindow.updateLogPanel(Utils.getLocalizedString("error_max_boats_placed"));
             return;
         }
 
         if (playerBoardState.placeShipOnBoard(y, x, boatSize, isHorizontal)) {
-            mainWindow.updateLogPanel(String.format("Ship of size %d created at %s%d", boatSize, Utils.getLetterCoordinate(x), y + 1));
+            mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("boat_created"),
+                    boatSize, Utils.getLetterCoordinate(x), y + 1));
             designState.setIsHorizontal(true);
         } else {
-            mainWindow.updateLogPanel(String.format("Ship of size %d cannot be placed at %s%d", boatSize, Utils.getLetterCoordinate(x), y + 1));
+            mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("boat_not_created"),
+                    boatSize, Utils.getLetterCoordinate(x), y + 1));
         }
     }
 
@@ -149,13 +152,26 @@ public class BattleshipController {
         System.out.printf("[DEBUG] Validating %s guess at %s%d%n", !isPlayersBoard ? "Human's" : "System's", Utils.getLetterCoordinate(x), y + 1);
         BoardState boardState = isPlayersBoard ? playerBoardState : systemBoardState;
         if (boardState.validateGuess(x, y)) {
-            mainWindow.updateLogPanel((String.format("%s successfully hit the player's ship at %s%d", !isPlayersBoard ? "Player" : "System",
+            mainWindow.updateLogPanel((String.format(Utils.getLocalizedString("guess_hit"),
+                    !isPlayersBoard ? Utils.getLocalizedString("player") : Utils.getLocalizedString("system"),
+                    isPlayersBoard ? Utils.getLocalizedString("player_possessive") : Utils.getLocalizedString("system_possessive"),
                     Utils.getLetterCoordinate(x), y + 1)));
         } else {
-            mainWindow.updateLogPanel((String.format("%s guessed %s%d and missed", !isPlayersBoard ? "Player" : "System",
+            mainWindow.updateLogPanel((String.format(Utils.getLocalizedString("guess_miss"),
+                    !isPlayersBoard ? Utils.getLocalizedString("player") : Utils.getLocalizedString("system"),
                     Utils.getLetterCoordinate(x), y + 1)));
         }
         // TODO after validating a guess, the game state should be validated (somewhere) to determine if end of game conditions have been met
+    }
+
+    /**
+     * System guesses a location on the player's board by randomly choosing a location
+     */
+    public void systemLocationGuess(){
+        final boolean isPlayersBoard = true;
+        final int randomRow = ThreadLocalRandom.current().nextInt(0, playerBoardState.getGridDimension());
+        final int randomCol = ThreadLocalRandom.current().nextInt(0, playerBoardState.getGridDimension());
+        validateGuess(isPlayersBoard, randomCol, randomRow);
     }
 
     /**
@@ -165,20 +181,31 @@ public class BattleshipController {
         // TODO start a timer
         if(gameState.getStatus() == GameStatus.RANDOM || playerBoardState.isDesignBoatsEmpty()) {
             mainWindow.updateLogPanel("Player has begun the game!");
-            mainWindow.updateLogPanel(String.format("A coin has been flipped and the %s can make the first guess!",
-                    gameState.isPlayersTurn() ? "Player" : "System"));
+            mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("first_turn"),
+                    gameState.isPlayersTurn() ? Utils.getLocalizedString("player") : Utils.getLocalizedString("system")));
             gameState.setStatus(GameStatus.IN_PROGRESS);
             playerBoardState.notifyObservers(); // not ideal, but if GameState notifies observers MainPanel needs board states passed too
             systemBoardState.notifyObservers();
         } else {
-            mainWindow.updateLogPanel("Error: Game cannot start yet, all of your ships must be placed on the board");
+            mainWindow.updateLogPanel(Utils.getLocalizedString("error_boats_missing"));
         }
+    }
+
+    /**
+     * Ends the game and displays the solution to the opposing player's board
+     */
+    public void displaySolution(){
+        mainWindow.updateLogPanel(Utils.getLocalizedString("player_forfeit"));
+        gameState.setStatus(GameStatus.GAME_OVER);
+        playerBoardState.notifyObservers(); // not ideal, but if GameState notifies observers MainPanel needs board states passed too
+        systemBoardState.notifyObservers();
     }
 
     /**
      * Changes the game status to be in DESIGN mode and clears the board in preparation
      */
     public void enterDesignMode() {
+        mainWindow.updateLogPanel(Utils.getLocalizedString("design_mode"));
         gameState.setStatus(GameStatus.DESIGN);
         playerBoardState.clearBoard();
     }
@@ -233,17 +260,17 @@ public class BattleshipController {
         playerBoardState.resizeGrid(newBoardDimension);
         systemBoardState.resizeGrid(newBoardDimension);
         systemBoardState.randomizeShipLocations();
-        mainWindow.updateLogPanel(String.format("Dimensions were changed to %dx%d", newBoardDimension, newBoardDimension));
+        mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("dimensions_changed"), newBoardDimension, newBoardDimension));
     }
 
     /**
      * Changes the language of the game on menus, event log, etc
      *
-     * @param language Language that the game is being set to
+     * @param newDefaultLocale Locale that the game is being set to
      */
-    public void changeLanguage(final Language language) {
-        gameState.setLanguage(language);
-        mainWindow.updateLogPanel(String.format("Language was changed to %s", language));
+    public void changeLanguage(final Locale newDefaultLocale) {
+        Locale.setDefault(newDefaultLocale);
+        mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("language_changed"), newDefaultLocale));
     }
 
     /**
