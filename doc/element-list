@@ -1,3 +1,6 @@
 Game
+Game.Controller
 Game.Model
+Game.Model.Enums
+Game.Util
 Game.View

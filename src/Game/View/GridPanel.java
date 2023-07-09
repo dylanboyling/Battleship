@@ -17,6 +17,11 @@ import java.awt.*;
  */
 public class GridPanel extends JPanel {
     /**
+     * Serializable UUID
+     */
+    private static final long serialVersionUID = 4L;
+
+    /**
      * Controller for the game which will process button clicks
      */
     private final BattleshipController controller;
@@ -32,21 +37,21 @@ public class GridPanel extends JPanel {
 
     /**
      * Initializes the panel representing a player's board
-     * @param gameState Current state of the game
+     *
+     * @param gameState  Current state of the game
      * @param boardState Current state of the board being used to display the grid
      */
     public void initializePanel(final GameState gameState, final BoardState boardState) {
-        GridSquare[][] grid = boardState.getGrid();
         final int dimension = boardState.getGridDimension();
         final boolean isPlayer = boardState.isPlayer();
 
         removeAll();
         setLayout(new GridLayout(0, dimension + 1, 2, 2));
         final JLabel emptyCornerLabel = new JLabel();
-        emptyCornerLabel.setPreferredSize(new Dimension(30, 30));
+        emptyCornerLabel.setPreferredSize(new Dimension(15, 15));
         add(emptyCornerLabel);
 
-        for (int col = 0; col < grid.length; col++) {
+        for (int col = 0; col < dimension; col++) {
             final JLabel colHeaderLabel = new JLabel();
             colHeaderLabel.setText(String.valueOf(Utils.getLetterCoordinate(col)));
             colHeaderLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -54,15 +59,17 @@ public class GridPanel extends JPanel {
             add(colHeaderLabel);
         }
 
-        for (int row = 0; row < grid.length; row++) {
+        for (int col = 0; col < dimension; col++) {
             final JLabel rowHeaderLabel = new JLabel();
-            rowHeaderLabel.setText(String.format("%d", row + 1));
+            rowHeaderLabel.setText(String.format("%d", col + 1));
             rowHeaderLabel.setHorizontalAlignment(JLabel.CENTER);
             rowHeaderLabel.setVerticalAlignment(JLabel.CENTER);
             add(rowHeaderLabel);
 
-            for (int col = 0; col < grid.length; col++) {
-                final GridButton gridButton = new GridButton(isPlayer, new Point(col, row));
+            for (int row = 0; row < dimension; row++) {
+                final GridSquare gridSquare = boardState.getGridSquare(row, col);
+                final GridButton gridButton = new GridButton(new Point(row, col));
+
                 gridButton.setMargin(new Insets(0, 0, 0, 0));
                 gridButton.addActionListener(e -> {
                     final int x = (int) gridButton.getCoordinates().getX();
@@ -70,31 +77,27 @@ public class GridPanel extends JPanel {
                     controller.handleGridClick(isPlayer, x, y);
                 });
 
-                final GridSquare gridSquare = grid[row][col];
                 final GameStatus gameStatus = gameState.getStatus();
                 if (gameStatus != GameStatus.IN_PROGRESS && !isPlayer) {
                     gridButton.setEnabled(false);
                 }
 
                 if (gridSquare != null) {
-                    if (isPlayer && gridSquare.isAlive() == GridSquareStatus.ALIVE || gameStatus == GameStatus.GAME_OVER) {
-                        gridButton.setText(Integer.toString(grid[row][col].getShipSize()));
+                    if (isPlayer && gridSquare.getStatus() == GridSquareStatus.ALIVE || gameStatus == GameStatus.GAME_OVER) {
+                        gridButton.setText(Integer.toString(gridSquare.getShipSize()));
                         gridButton.setBackground(Color.gray);
                         gridButton.setOpaque(true);
-                        gridButton.setBorderPainted(false);
-                        gridButton.setEnabled(true); // enable to view ship size text on grid when in game over
-                    } else if (gridSquare.isAlive() == GridSquareStatus.HIT) {
-                        gridButton.setEnabled(false);
+                    } else if (gridSquare.getStatus() == GridSquareStatus.HIT) {
+                        gridButton.setText(Integer.toString(gridSquare.getShipSize()));
                         gridButton.setBackground(Color.red);
                         gridButton.setOpaque(true);
-                        gridButton.setBorderPainted(false);
-                    } else if (gridSquare.isAlive() == GridSquareStatus.MISSED) {
-                        gridButton.setEnabled(false);
+                        gridButton.setEnabled(false); // TODO disabling buttons doesn't fill them - fix?
+                    } else if (gridSquare.getStatus() == GridSquareStatus.MISSED) {
                         gridButton.setBackground(Color.blue);
                         gridButton.setOpaque(true);
-                        gridButton.setBorderPainted(false);
+                        gridButton.setEnabled(false);
                     }
-                } else if (gameStatus == GameStatus.IN_PROGRESS && gameState.isPlayersTurn() && !isPlayer){
+                } else if (gameStatus == GameStatus.IN_PROGRESS && gameState.isPlayersTurn() && !isPlayer) {
                     gridButton.setEnabled(true);
                 }
 
@@ -111,11 +114,10 @@ public class GridPanel extends JPanel {
      * Grid button represents a clickable square on a player's board.
      */
     private static class GridButton extends JButton {
-
         /**
-         * Indicates whether button belongs to human player (true) or system (false)
+         * Serializable UUID
          */
-        private boolean isPlayer;
+        private static final long serialVersionUID = 5L;
 
         /**
          * Point containing (x,y) location on player's board
@@ -125,22 +127,13 @@ public class GridPanel extends JPanel {
         /**
          * Constructor for the grid button
          *
-         * @param isPlayer    true if human player, false if system
          * @param coordinates (x,y) coordinates corresponding to the game board
          */
-        public GridButton(final boolean isPlayer, final Point coordinates) {
-            this.isPlayer = isPlayer;
+        public GridButton(final Point coordinates) {
+            /**
+             * Indicates whether button belongs to human player (true) or system (false)
+             */
             this.coordinates = coordinates;
-        }
-
-        /**
-         * Default constructor for button with coordinates
-         *
-         * @param x X location of button on game grid
-         * @param y Y location of button on game grid
-         */
-        public GridButton(final int x, final int y) {
-            this.coordinates = new Point(x, y);
         }
 
         /**
@@ -152,13 +145,5 @@ public class GridPanel extends JPanel {
             return coordinates;
         }
 
-        /**
-         * Gets isPlayer status for button
-         *
-         * @return True if button belongs to player, false if belongs to system
-         */
-        public boolean isPlayer() {
-            return isPlayer;
-        }
     }
 }

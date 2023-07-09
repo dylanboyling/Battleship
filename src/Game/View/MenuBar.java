@@ -11,23 +11,33 @@ import static java.lang.System.exit;
  * This class creates the primary menu bar for the game which contains extra options not displayed in the main window
  */
 public class MenuBar extends JMenuBar {
+    /**
+     * Serializable UUID
+     */
+    private static final long serialVersionUID = 7L;
 
     /**
      * Initializes the menu bar and it's sub-items
+     *
      * @param parentFrame Frame that this menu bar belongs to
-     * @param controller Controller for the game which will process requests from the menu bar
+     * @param controller  Controller for the game which will process requests from the menu bar
      */
-    public void initializeMenuBar(JFrame parentFrame, BattleshipController controller){
-        // TODO add behaviors
+    public void initializeMenuBar(MainPanel parentFrame, BattleshipController controller) {
+
         JMenuItem newGameMenuItem = new JMenuItem(Utils.getLocalizedString("new_game"));
-        newGameMenuItem.addActionListener(e->{
+        newGameMenuItem.addActionListener(e -> {
+            int userChoice = JOptionPane.showConfirmDialog(parentFrame.getContentPane(), Utils.getLocalizedString("new_game_ask"),
+                    Utils.getLocalizedString("new_game_title"), JOptionPane.YES_NO_OPTION);
+            if (userChoice == JOptionPane.YES_OPTION) {
+                controller.newGame();
+            }
         });
         JMenuItem solutionMenuItem = new JMenuItem(Utils.getLocalizedString("solution"));
-        solutionMenuItem.addActionListener(e->{
+        solutionMenuItem.addActionListener(e -> {
             controller.displaySolution();
         });
         JMenuItem exitMenuItem = new JMenuItem(Utils.getLocalizedString("exit"));
-        exitMenuItem.addActionListener(e->{
+        exitMenuItem.addActionListener(e -> {
         });
         exitMenuItem = new JMenuItem(Utils.getLocalizedString("exit"));
         exitMenuItem.addActionListener(e -> {
@@ -45,10 +55,11 @@ public class MenuBar extends JMenuBar {
         gameMenu.add(exitMenuItem);
 
         JMenuItem colorsMenuItem = new JMenuItem(Utils.getLocalizedString("colors"));
-        colorsMenuItem.addActionListener(e->{
+        colorsMenuItem.addActionListener(e -> {
+            parentFrame.updateLogPanel(Utils.getLocalizedString("color_notice"));
         });
         JMenuItem aboutMenuItem = new JMenuItem(Utils.getLocalizedString("about"));
-        aboutMenuItem.addActionListener(e->{
+        aboutMenuItem.addActionListener(e -> {
             JOptionPane.showMessageDialog(parentFrame, Utils.getLocalizedString("about_msg"));
         });
 

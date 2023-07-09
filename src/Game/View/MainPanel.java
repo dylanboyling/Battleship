@@ -3,6 +3,7 @@ package Game.View;
 import Game.Controller.BattleshipController;
 import Game.Model.BoardState;
 import Game.Model.DesignState;
+import Game.Model.Enums.GameStatus;
 import Game.Model.GameState;
 import Game.Util.Utils;
 
@@ -11,20 +12,27 @@ import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
+import static java.lang.System.exit;
+
 /**
  * This class creates and initializes the main panel which includes the game boards, event log, and options menu
  */
 @SuppressWarnings("deprecation")
 public class MainPanel extends JFrame implements Observer {
     /**
+     * Serializable UUID
+     */
+    private static final long serialVersionUID = 2L;
+
+    /**
      * Width of the main window
      */
-    public static final int MAIN_WINDOW_WIDTH = 1600;
+    public static final int MAIN_WINDOW_WIDTH = 1700;
 
     /**
      * Height of the main window
      */
-    public static final int MAIN_WINDOW_HEIGHT = 1000;
+    public static final int MAIN_WINDOW_HEIGHT = 1100;
 
     /**
      * Main frame which contains all UI elements
@@ -58,6 +66,7 @@ public class MainPanel extends JFrame implements Observer {
 
     /**
      * Creates a new main panel and links it to the controller for the game
+     *
      * @param controller Controller for the Battleship game used to respond to requests from the main panel
      */
     public MainPanel(BattleshipController controller) {
@@ -67,8 +76,9 @@ public class MainPanel extends JFrame implements Observer {
 
     /**
      * Initializes the main window and initializes different sections of the UI
-     * @param gameState Current state of the game
-     * @param designState Current state of the design phase
+     *
+     * @param gameState        Current state of the game
+     * @param designState      Current state of the design phase
      * @param playerBoardState Current state of the player's board and their ships
      * @param systemBoardState Current state of the system's board and it's ships
      */
@@ -84,13 +94,13 @@ public class MainPanel extends JFrame implements Observer {
         main.setLayout(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
-        MenuBar menuBar = new MenuBar();
-        menuBar.initializeMenuBar(this, controller);
-        main.setJMenuBar(menuBar);
+        initializeMenuBar();
 
         eventPanel = new EventPanel();
         eventPanel.initializePanel();
         eventPanel.setPreferredSize(new Dimension(w, (int) (MAIN_WINDOW_HEIGHT * 0.2F)));
+
+        gameState.addObserver(this);
 
         playerGrid = new GridPanel(controller);
         playerGrid.setPreferredSize(new Dimension(w, h));
@@ -104,7 +114,7 @@ public class MainPanel extends JFrame implements Observer {
 
         optionsPanel = new OptionsPanel(controller);
         optionsPanel.initializePanel(designState);
-        optionsPanel.setPreferredSize(new Dimension(w, (int) (MAIN_WINDOW_HEIGHT * 0.2)));
+        optionsPanel.setPreferredSize(new Dimension(w, (int) (MAIN_WINDOW_HEIGHT * 0.2F)));
 
         // First row (Player and System grids)
         layoutConstraints.gridx = 0;
@@ -144,6 +154,36 @@ public class MainPanel extends JFrame implements Observer {
                 optionsPanel.initializePanel(controller.getDesignState());
             } else
                 systemGrid.initializePanel(gameState, boardState);
+        } else if (o instanceof GameState) {
+            final GameState gameState = (GameState) o;
+            final BoardState playerBoardState = controller.getBoardState(true);
+            final BoardState systemBoardState = controller.getBoardState(false);
+
+            playerGrid.initializePanel(gameState, playerBoardState);
+            systemGrid.initializePanel(gameState, systemBoardState);
+
+            if(gameState.hasLocaleChanged()){
+                eventPanel.initializePanel();
+                optionsPanel.initializePanel(controller.getDesignState());
+                initializeMenuBar();
+                gameState.setHasLocaleChanged(false);
+            }
+
+            if ((gameState.getStatus() == GameStatus.GAME_OVER)) {
+                int userChoice = JOptionPane.showConfirmDialog(getContentPane(),
+                        String.format(Utils.getLocalizedString("game_over"),
+                                gameState.didPlayerWin() ? Utils.getLocalizedString("player") : Utils.getLocalizedString("system"),
+                                systemBoardState.getTotalHitPoints() - systemBoardState.getHitPointsRemaining(),
+                                playerBoardState.getTotalHitPoints() - playerBoardState.getHitPointsRemaining())
+                                + "\n" + String.format(Utils.getLocalizedString("win_loss"), gameState.getPlayerGamesWon(), gameState.getSystemGamesWon())
+                                + "\n" + Utils.getLocalizedString("game_over_restart"),
+                        Utils.getLocalizedString("new_game_title"), JOptionPane.YES_NO_OPTION);
+                if (userChoice == JOptionPane.YES_OPTION) {
+                    controller.newGame();
+                } else{
+                    exit(0);
+                }
+            }
         }
 
         main.repaint();
@@ -152,6 +192,7 @@ public class MainPanel extends JFrame implements Observer {
 
     /**
      * Updates the event log window by outputting a message to it
+     *
      * @param event Game event that is to be displayed to the user
      */
     public void updateLogPanel(String event) {
@@ -161,15 +202,27 @@ public class MainPanel extends JFrame implements Observer {
     }
 
     /**
+     * Initializes menu bar
+     */
+    private void initializeMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        menuBar.initializeMenuBar(this, controller);
+        main.setJMenuBar(menuBar);
+    }
+
+    /**
      * Sets the look and feel of the game to match the operating system and it's settings that it's running on
      */
     private void setLookAndFeel() {
         SwingUtilities.invokeLater(() -> {
             try {
-                UIManager.setLookAndFeel(
-                        UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                     UnsupportedLookAndFeelException e) {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });

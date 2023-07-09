@@ -17,11 +17,19 @@ import java.util.Locale;
  */
 public class OptionsPanel extends JPanel {
     /**
+     * Serializable UUID
+     */
+    private static final long serialVersionUID = 6L;
+
+    /**
      * Dimension options a user may select to change the dimensions of the game board
      */
     private final String[] DIMENSION_OPTIONS = new String[]{"2x2", "4x4", "6x6", "8x8", "10x10", "12x12", "14x14",
             "16x16", "18x18", "20x20"};
 
+    /**
+     * Controller for the game, will respond to requests to change various options
+     */
     private final BattleshipController controller;
 
     /**
@@ -35,6 +43,8 @@ public class OptionsPanel extends JPanel {
 
     /**
      * Initializes the options panel by creating the UI elements for selecting options
+     *
+     * @param designState Current state that the design phase is in
      */
     public void initializePanel(final DesignState designState) {
         removeAll();
@@ -51,6 +61,7 @@ public class OptionsPanel extends JPanel {
 
     /**
      * Creates the configuration panel which contains various game settings
+     *
      * @return Configuration panel
      */
     private JPanel initializeConfigurationPanel() {
@@ -66,6 +77,7 @@ public class OptionsPanel extends JPanel {
             System.out.printf("[DEBUG] Language was changed to %s%n", languages.getSelectedItem());
             controller.changeLanguage((Locale) languages.getSelectedItem());
         });
+        languages.setSelectedItem(Locale.getDefault());
 
         final JLabel dimensionLabel = new JLabel(Utils.getLocalizedString("dimensions"));
         final JComboBox<String> dimensions = new JComboBox<>(DIMENSION_OPTIONS);
@@ -74,13 +86,13 @@ public class OptionsPanel extends JPanel {
         final JButton resetButton = new JButton(Utils.getLocalizedString("reset"));
         final JButton playButton = new JButton(Utils.getLocalizedString("play"));
 
-        if(gameStatus == GameStatus.IN_PROGRESS || gameStatus == GameStatus.GAME_OVER){
+        if (gameStatus == GameStatus.IN_PROGRESS || gameStatus == GameStatus.GAME_OVER) {
             randomizeShips.setEnabled(false);
             designShips.setEnabled(false);
             resetButton.setEnabled(false);
             playButton.setEnabled(false);
             dimensions.setEnabled(false);
-        } else{
+        } else {
             dimensions.setSelectedIndex(controller.getDimension() / 2 - 1);
             dimensions.addActionListener(e -> {
                 System.out.printf("[DEBUG] Dimensions were changed to %s%n", dimensions.getSelectedItem());
@@ -100,7 +112,7 @@ public class OptionsPanel extends JPanel {
             });
             playButton.addActionListener(e -> {
                 System.out.println("[DEBUG] User has pressed the button to play the game");
-                controller.beginGame();
+                controller.playGame();
             });
         }
 
@@ -135,6 +147,8 @@ public class OptionsPanel extends JPanel {
 
     /**
      * Creates design panel which contains various options for the player to place ships onto the game board
+     *
+     * @param designState Current state that the design phase is in
      * @return Panel containing design menu
      */
     private JPanel initializeDesignPanel(DesignState designState) {
@@ -147,15 +161,18 @@ public class OptionsPanel extends JPanel {
         final JComboBox<Integer> boatSizes = new JComboBox<>(sizeOptions);
 
         final JLabel boatCountRemaining = new JLabel(String.format(Utils.getLocalizedString("boats_remaining"),
-                (Integer) boatSizes.getSelectedItem(),
+                boatSizes.getSelectedItem(),
                 controller.getBoatsRemaining((Integer) boatSizes.getSelectedItem())));
         boatSizes.addActionListener(e -> {
             System.out.printf("[DEBUG] Boat size to be placed was changed to %s%n", boatSizes.getSelectedItem());
-            boatCountRemaining.setText(String.format(Utils.getLocalizedString("boats_remaining"), (Integer) boatSizes.getSelectedItem(),
-                controller.getBoatsRemaining((Integer) boatSizes.getSelectedItem())));
+            boatCountRemaining.setText(String.format(Utils.getLocalizedString("boats_remaining"), boatSizes.getSelectedItem(),
+                    controller.getBoatsRemaining((Integer) boatSizes.getSelectedItem())));
             controller.setSelectedBoatSize((Integer) boatSizes.getSelectedItem());
         });
-        boatSizes.setSelectedIndex((controller.getDimension() / 2) - designState.getBoatSize()); // auto selects last selected boat
+        if (designState.getBoatSize() < sizeOptions.length)
+            boatSizes.setSelectedIndex((controller.getDimension() / 2) - designState.getBoatSize()); // auto selects last selected boat
+        else
+            boatSizes.setSelectedIndex(0);
 
         designPanel.add(Box.createRigidArea(new Dimension(25, 0)));
         designPanel.add(boatSizeLabel);
@@ -164,8 +181,6 @@ public class OptionsPanel extends JPanel {
         designPanel.add(boatCountRemaining);
         designPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 
-        // TODO add boats remaining text
-
         final JLabel directionLabel = new JLabel(Utils.getLocalizedString("boat_direction"));
         final JRadioButton horizontalButton = new JRadioButton(Utils.getLocalizedString("horizontal"));
         final JRadioButton verticalButton = new JRadioButton(Utils.getLocalizedString("vertical"));
@@ -173,10 +188,10 @@ public class OptionsPanel extends JPanel {
 
         final boolean HORIZONTAL = true;
         final boolean VERTICAL = false;
-        horizontalButton.addActionListener(e->{
+        horizontalButton.addActionListener(e -> {
             controller.setSelectedBoatOrientation(HORIZONTAL);
         });
-        verticalButton.addActionListener(e->{
+        verticalButton.addActionListener(e -> {
             controller.setSelectedBoatOrientation(VERTICAL);
         });
         directionButtons.add(horizontalButton);

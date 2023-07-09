@@ -7,9 +7,13 @@ import Game.Model.Enums.GridSquareStatus;
  */
 public class GridSquare {
     /**
+     * Boat that this square belongs to
+     */
+    private final GridBoat gridBoat;
+    /**
      * Status if the ship piece on (x,y) is a ive or not, true if the ship is alive and false if not
      */
-    private GridSquareStatus isAlive;
+    private GridSquareStatus status;
 
     /**
      * True if square belongs to player, false if belongs to system
@@ -24,14 +28,16 @@ public class GridSquare {
     /**
      * Creates a new grid square for the Battleship board
      *
+     * @param gridBoat Boat that this square belongs to
      * @param shipSize Size of the ship that this square belongs to
      * @param isPlayer True if the square belongs to the player, false otherwise
-     * @param isAlive  True if the square has not been hit yet, false if it has
+     * @param status   True if the square has not been hit yet, false if it has
      */
-    public GridSquare(int shipSize, boolean isPlayer, GridSquareStatus isAlive) {
+    public GridSquare(final GridBoat gridBoat, int shipSize, boolean isPlayer, GridSquareStatus status) {
+        this.gridBoat = gridBoat;
         this.shipSize = shipSize;
         this.isPlayer = isPlayer;
-        this.isAlive = isAlive;
+        this.status = status;
     }
 
     /**
@@ -48,17 +54,17 @@ public class GridSquare {
      *
      * @return Ship status on this grid square
      */
-    public GridSquareStatus isAlive() {
-        return isAlive;
+    public GridSquareStatus getStatus() {
+        return status;
     }
 
     /**
      * Changes the status of the grid square
      *
-     * @param isAlive New status of the grid square
+     * @param status New status of the grid square
      */
-    public void setAlive(GridSquareStatus isAlive) {
-        this.isAlive = isAlive;
+    public void setStatus(GridSquareStatus status) {
+        this.status = status;
     }
 
     /**
@@ -68,5 +74,14 @@ public class GridSquare {
      */
     public boolean isPlayer() {
         return isPlayer;
+    }
+
+    /**
+     * Returns the grid boat that this square belongs to
+     *
+     * @return Grid boat the square belongs to
+     */
+    public GridBoat getGridBoat() {
+        return gridBoat;
     }
 }

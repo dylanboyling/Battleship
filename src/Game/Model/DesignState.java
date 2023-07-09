@@ -11,7 +11,7 @@ public class DesignState {
      */
     private int boatSize;
 
-    public DesignState(){
+    public DesignState() {
         isHorizontal = true;
         boatSize = 1;
     }

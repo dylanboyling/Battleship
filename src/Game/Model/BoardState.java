@@ -16,7 +16,6 @@ import static Game.Util.Constants.DEFAULT_GRID_DIMENSION;
  */
 @SuppressWarnings("deprecation")
 public class BoardState extends Observable {
-
     /**
      * Dimension of one side of the square grid, e.g. gridDimension x gridDimension
      */
@@ -37,7 +36,12 @@ public class BoardState extends Observable {
      * Stores current boats that can be placed during the design phase. Note: This is a last minute solution to display
      * how many boats can still be placed to the user. It is by no means an ideal solution but it works.
      */
-    private List<DesignBoat> designBoats;
+    private List<GridBoat> designBoatsNotPlaced;
+
+    /**
+     * Boats currently on the board
+     */
+    private List<GridBoat> boatsOnBoard;
 
     /**
      * List of boat sizes that the player can place on the ship
@@ -50,6 +54,7 @@ public class BoardState extends Observable {
      * @param isPlayer True if board belongs to player, false otherwise
      */
     public BoardState(boolean isPlayer) {
+        this.boatsOnBoard = new ArrayList<>();
         this.isPlayer = isPlayer;
         this.resizeGrid(DEFAULT_GRID_DIMENSION);
     }
@@ -58,8 +63,9 @@ public class BoardState extends Observable {
      * Resets the grid to its default dimension and re-initializes the state
      */
     public void reset() {
+        boatsOnBoard = new ArrayList<>();
         gridDimension = DEFAULT_GRID_DIMENSION;
-        grid = new GridSquare[DEFAULT_GRID_DIMENSION][DEFAULT_GRID_DIMENSION];
+        resizeGrid(DEFAULT_GRID_DIMENSION);
         notifyObservers();
     }
 
@@ -68,7 +74,7 @@ public class BoardState extends Observable {
      */
     public void clearBoard() {
         grid = new GridSquare[gridDimension][gridDimension];
-        if(isPlayer)
+        if (isPlayer)
             populateDesignShips();
         notifyObservers();
     }
@@ -78,14 +84,17 @@ public class BoardState extends Observable {
      *
      * @param x X coordinate of the guess on the grid
      * @param y Y coordinate of the guess on the grid
+     * @return Returns true if the guess is valid, false if its not
      */
     public boolean validateGuess(final int x, final int y) {
+        GridSquare gridSquare = grid[y][x];
         boolean isCorrect = false;
-        if (grid[y][x] != null && grid[y][x].isAlive() == GridSquareStatus.ALIVE) {
-            grid[y][x].setAlive(GridSquareStatus.HIT);
+        if (gridSquare != null && gridSquare.getStatus() == GridSquareStatus.ALIVE) {
+            gridSquare.setStatus(GridSquareStatus.HIT);
+            gridSquare.getGridBoat().takeHit();
             isCorrect = true;
         } else {
-            grid[y][x] = new GridSquare(0, isPlayer, GridSquareStatus.MISSED);
+            grid[y][x] = new GridSquare(new GridBoat(-1), 0, isPlayer, GridSquareStatus.MISSED); // TODO new constructor for empty square
         }
 
         notifyObservers();
@@ -94,9 +103,10 @@ public class BoardState extends Observable {
 
     /**
      * Places a boat of a given ship size at the provided coordinates
-     * @param row Row that the boat begins
-     * @param column Column that the boat begins
-     * @param boatSize Size of the boat to be created
+     *
+     * @param row          Row that the boat begins
+     * @param column       Column that the boat begins
+     * @param boatSize     Size of the boat to be created
      * @param isHorizontal True if the boat is horizontal, false if it is vertical
      * @return True if the boat has been placed, false the location is invalid and it cannot be placed
      */
@@ -104,9 +114,9 @@ public class BoardState extends Observable {
         boolean isSuccessful = false;
         if (isLocationValid(row, column, boatSize, isHorizontal)) {
             createBoat(row, column, boatSize, isHorizontal);
-            for (Iterator<DesignBoat> iterator = designBoats.iterator(); iterator.hasNext();) {
-                DesignBoat boat = iterator.next();
-                if(boat.getBoatSize() == boatSize) {
+            for (Iterator<GridBoat> iterator = designBoatsNotPlaced.iterator(); iterator.hasNext(); ) {
+                GridBoat boat = iterator.next();
+                if (boat.getBoatSize() == boatSize) {
                     iterator.remove();
                     break;
                 }
@@ -121,7 +131,7 @@ public class BoardState extends Observable {
      * Places a varying number of ships in random locations on the board. Number of ships placed changes on grid size.
      */
     public void randomizeShipLocations() {
-        grid = new GridSquare[gridDimension][gridDimension];
+        resizeGrid(gridDimension);
         final int DIM = gridDimension / 2;
         for (int boatSize = DIM; boatSize > 0; boatSize--) {
             int debug_numberOfBoats = -1;
@@ -138,29 +148,27 @@ public class BoardState extends Observable {
     /**
      * Repopulates the list of ships that can be placed on the board
      */
-    private void populateDesignShips(){
-        designBoats = new ArrayList<>();
+    private void populateDesignShips() {
+        designBoatsNotPlaced = new ArrayList<>();
         final int DIM = gridDimension / 2;
         for (int boatSize = DIM; boatSize > 0; boatSize--) {
-            int debug_numberOfBoats = -1;
             for (int numberOfBoats = 1; numberOfBoats <= DIM - boatSize + 1; numberOfBoats++) {
-                designBoats.add(new DesignBoat(boatSize));
-                debug_numberOfBoats = numberOfBoats;
+                designBoatsNotPlaced.add(new GridBoat(boatSize));
             }
-            System.out.printf("[DEBUG] %d boats of size %d can be placed by the player%n", debug_numberOfBoats, boatSize);
         }
         populateBoatSizeOptions();
     }
 
     /**
      * Checks how many boats of size N are remaining and can still be placed on the board
+     *
      * @param boatSize Size of boat to be checked
      * @return Number of boats of boatSize remaining
      */
-    public int numberOfBoatSizesRemaining(final int boatSize){
+    public int numberOfBoatSizesRemaining(final int boatSize) {
         int numberOfBoats = 0;
-        for(DesignBoat boat : designBoats){
-            if(boat.getBoatSize() == boatSize)
+        for (GridBoat boat : designBoatsNotPlaced) {
+            if (boat.getBoatSize() == boatSize)
                 numberOfBoats++;
         }
 
@@ -170,11 +178,11 @@ public class BoardState extends Observable {
     /**
      * Populates the list of unique boat sizes that may be placed on the board
      */
-    public void populateBoatSizeOptions(){
+    public void populateBoatSizeOptions() {
         int boatSize = -1;
         boatSizeOptions = new ArrayList<>();
-        for(DesignBoat boat : designBoats){
-            if(boatSize != boat.getBoatSize()) {
+        for (GridBoat boat : designBoatsNotPlaced) {
+            if (boatSize != boat.getBoatSize()) {
                 boatSize = boat.getBoatSize();
                 boatSizeOptions.add(boatSize);
             }
@@ -183,18 +191,20 @@ public class BoardState extends Observable {
 
     /**
      * Returns list of unique boat sizes that may be placed on the board
+     *
      * @return List of unique  boat sizes that may be placed on the board
      */
-    public List<Integer> getBoatSizeOptions(){
+    public List<Integer> getBoatSizeOptions() {
         return boatSizeOptions;
     }
 
     /**
      * Checks if there are any boats that can still be placed on the game board
+     *
      * @return True if all boats have been placed, false if there are some remaining
      */
-    public boolean isDesignBoatsEmpty(){
-        return designBoats.isEmpty();
+    public boolean isDesignBoatsEmpty() {
+        return designBoatsNotPlaced.isEmpty();
     }
 
     /**
@@ -221,23 +231,26 @@ public class BoardState extends Observable {
      * @param newGridDimension New dimension of the board
      */
     public void resizeGrid(final int newGridDimension) {
-        gridDimension = newGridDimension;
         System.out.printf("[DEBUG] New grid dimension is %dx%d%n", gridDimension, gridDimension);
+        boatsOnBoard = new ArrayList<>();
+        gridDimension = newGridDimension;
         grid = new GridSquare[gridDimension][gridDimension];
 
-        if(isPlayer)
+        if (isPlayer)
             populateDesignShips();
 
         notifyObservers();
     }
 
     /**
-     * Returns the grid containing the current state of the game
+     * Returns the grid square at location x,y
+     * @param x X coordinate where grid square is
+     * @param y Y coordinate where grid square is
      *
-     * @return Grid of GridSquares containing info about ships
+     * @return Grid square at location x,y
      */
-    public GridSquare[][] getGrid() {
-        return this.grid;
+    public GridSquare getGridSquare(final int x, final int y) {
+        return grid[y][x];
     }
 
     /**
@@ -316,16 +329,46 @@ public class BoardState extends Observable {
      * @param isHorizontal True if ship is horizontal (left to right), false if vertical (top to bottom)
      */
     private void createBoat(final int row, final int column, final int boatSize, final boolean isHorizontal) {
+        GridBoat gridBoat = new GridBoat(boatSize);
+        boatsOnBoard.add(gridBoat);
         if (isHorizontal) {
             for (int i = 0; i < boatSize; i++) {
-                grid[row][column + i] = new GridSquare(boatSize, isPlayer, GridSquareStatus.ALIVE);
+                grid[row][column + i] = new GridSquare(gridBoat, boatSize, isPlayer, GridSquareStatus.ALIVE);
             }
         } else {
             for (int i = 0; i < boatSize; i++) {
-                grid[row + i][column] = new GridSquare(boatSize, isPlayer, GridSquareStatus.ALIVE);
+                grid[row + i][column] = new GridSquare(gridBoat, boatSize, isPlayer, GridSquareStatus.ALIVE);
             }
         }
         System.out.printf("[DEBUG] %s %s boat of size %d was created at (%dx%d)%n", isPlayer ? "Player" : "System"
                 , isHorizontal ? "Horizontal" : "Vertical", boatSize, row + 1, column + 1);
+    }
+
+    /**
+     * Gets the GridBoat at a certain square
+     *
+     * @param x X where the boat is located
+     * @param y Y where the boat is located
+     * @return Health of the boat at X,Y
+     */
+    public int getGridBoatHealth(final int x, final int y) {
+        return grid[y][x].getGridBoat().getBoatHealth();
+    }
+
+    public int getHitPointsRemaining() {
+        int hitPointsRemaining = 0;
+        for (GridBoat boat : boatsOnBoard) {
+            if (boat.getBoatHealth() > 0)
+                hitPointsRemaining += boat.getBoatHealth();
+        }
+        return hitPointsRemaining;
+    }
+
+    public int getTotalHitPoints() {
+        int totalHitPoints = 0;
+        for (GridBoat boat : boatsOnBoard) {
+            totalHitPoints += boat.getBoatSize();
+        }
+        return totalHitPoints;
     }
 }

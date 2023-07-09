@@ -10,6 +10,10 @@ import java.awt.*;
  * This class is displays the history log for guesses, option selections, and general info to the user
  */
 public class EventPanel extends JPanel {
+    /**
+     * Serializable UUID
+     */
+    private static final long serialVersionUID = 3L;
 
     /**
      * Game log containing move history and various game information
@@ -20,6 +24,7 @@ public class EventPanel extends JPanel {
      * Initializes the window containing a scrollable text box for the game's history log
      */
     public void initializePanel() {
+        removeAll();
         setLayout(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
