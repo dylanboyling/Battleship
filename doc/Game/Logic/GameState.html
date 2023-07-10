@@ -115,7 +115,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">Game.Logic</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">Game.Model</a></div>
 <h2 title="Class GameState" class="title">Class GameState</h2>
 </div>
 <div class="contentContainer">
@@ -126,7 +126,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.util.Observable</li>
 <li>
 <ul class="inheritance">
-<li>Game.Logic.GameState</li>
+<li>Game.Model.BoardState</li>
 </ul>
 </li>
 </ul>
@@ -159,7 +159,7 @@ extends java.util.Observable</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(Game.UI.LogPanel,int)">GameState</a></span>&#8203;(<a href="../UI/LogPanel.html" title="class in Game.UI">LogPanel</a>&nbsp;logPanel,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(Game.UI.LogPanel,int)">GameState</a></span>&#8203;(<a href="../UI/LogPanel.html" title="class in Game.View">LogPanel</a>&nbsp;logPanel,
          int&nbsp;boardDimension)</code></th>
 <td class="colLast">
 <div class="block">Constructs a fresh state of the Battleship game and initializes an empty grid</div>
@@ -184,7 +184,7 @@ extends java.util.Observable</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="GridSquare.html" title="class in Game.Logic">GridSquare</a>[][]</code></td>
+<td class="colFirst"><code><a href="GridSquare.html" title="class in Game.Model">GridSquare</a>[][]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGrid()">getGrid</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the grid containing the current state of the game</div>
@@ -257,7 +257,7 @@ extends java.util.Observable</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GameState</h4>
-<pre>public&nbsp;GameState&#8203;(<a href="../UI/LogPanel.html" title="class in Game.UI">LogPanel</a>&nbsp;logPanel,
+<pre>public&nbsp;GameState&#8203;(<a href="../UI/LogPanel.html" title="class in Game.View">LogPanel</a>&nbsp;logPanel,
                  int&nbsp;boardDimension)</pre>
 <div class="block">Constructs a fresh state of the Battleship game and initializes an empty grid</div>
 <dl>
@@ -307,7 +307,7 @@ extends java.util.Observable</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getGrid</h4>
-<pre class="methodSignature">public&nbsp;<a href="GridSquare.html" title="class in Game.Logic">GridSquare</a>[][]&nbsp;getGrid()</pre>
+<pre class="methodSignature">public&nbsp;<a href="GridSquare.html" title="class in Game.Model">GridSquare</a>[][]&nbsp;getGrid()</pre>
 <div class="block">Returns the grid containing the current state of the game</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>

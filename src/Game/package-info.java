@@ -1,4 +1,4 @@
 /**
- * These classes contain all the UI and backend logic for the Battleship game.
+ * Contains all packages related to and required to run the Battleship game
  */
 package Game;
