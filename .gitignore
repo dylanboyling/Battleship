@@ -1,11 +1,3 @@
-### stuff ### 
-*.err
-*.out
-*.iml
-*.bat
-*.zip
-*.7z 
-
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
@@ -38,6 +30,3 @@ bin/
 .DS_Store./idea
 /idea
 idea/
-
-### Project Specific ###
-CST8211.iml
