@@ -9,7 +9,7 @@ CLS
 
 :: LOCAL VARIABLES ....................................................
 
-SET LIBDIR=lib
+::SET LIBDIR=lib
 SET SRCDIR=src
 SET BINDIR=bin
 SET BINERR=jap-javac.err
@@ -19,10 +19,10 @@ SET JARERR=jap-jar.err
 SET DOCDIR=doc
 SET DOCPACK=Game
 SET DOCERR=jap-javadoc.err
-SET MAINCLASSSRC=src/Game/Battleship.java
+SET MAINCLASSSRC=src/Game/Controller/Battleship.java
 SET MAINCLASSBIN=Game.Controller.Battleship
 SET IMAGES=images
-SET RESOURCES=resources
+SET RESOURCES=res
 
 @echo off
 
