@@ -12,8 +12,6 @@ import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-import static java.lang.System.exit;
-
 /**
  * This class creates and initializes the main panel which includes the game boards, event log, and options menu
  */
@@ -27,12 +25,12 @@ public class MainPanel extends JFrame implements Observer {
     /**
      * Width of the main window
      */
-    public static final int MAIN_WINDOW_WIDTH = 1700;
+    public static final int MAIN_WINDOW_WIDTH = 1200;
 
     /**
      * Height of the main window
      */
-    public static final int MAIN_WINDOW_HEIGHT = 1100;
+    public static final int MAIN_WINDOW_HEIGHT = 900;
 
     /**
      * Main frame which contains all UI elements
@@ -53,6 +51,11 @@ public class MainPanel extends JFrame implements Observer {
      * Contains selection boxes and buttons to change the game's options
      */
     private OptionsPanel optionsPanel;
+
+    /**
+     * Contains health bar for both the player and system
+     */
+    private HealthBarsPanel healthBarsPanel;
 
     /**
      * Grid of buttons for the system's game board
@@ -84,21 +87,18 @@ public class MainPanel extends JFrame implements Observer {
      */
     public void initializePanel(GameState gameState, DesignState designState, BoardState playerBoardState,
                                 BoardState systemBoardState) {
-        setLookAndFeel();
-
-        int w = (int) (MAIN_WINDOW_WIDTH / 2F);
-        int h = (int) (MAIN_WINDOW_HEIGHT * 0.8);
+        final int w = (int) (MAIN_WINDOW_WIDTH / 2F);
+        final int h = (int) (MAIN_WINDOW_HEIGHT * 0.7);
 
         main = new JFrame(Utils.getLocalizedString("title_bar"));
         main.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        main.setLayout(new GridBagLayout());
-        GridBagConstraints layoutConstraints = new GridBagConstraints();
+        main.setLayout(new BorderLayout());
 
         initializeMenuBar();
 
         eventPanel = new EventPanel();
         eventPanel.initializePanel();
-        eventPanel.setPreferredSize(new Dimension(w, (int) (MAIN_WINDOW_HEIGHT * 0.2F)));
+        eventPanel.setPreferredSize(new Dimension(w - 50, (int) (MAIN_WINDOW_HEIGHT * 0.15)));
 
         gameState.addObserver(this);
 
@@ -114,22 +114,34 @@ public class MainPanel extends JFrame implements Observer {
 
         optionsPanel = new OptionsPanel(controller);
         optionsPanel.initializePanel(designState);
-        optionsPanel.setPreferredSize(new Dimension(w, (int) (MAIN_WINDOW_HEIGHT * 0.2F)));
 
-        // First row (Player and System grids)
-        layoutConstraints.gridx = 0;
-        layoutConstraints.gridy = 0;
-        main.add(playerGrid, layoutConstraints);
-        layoutConstraints.gridx = 1;
-        main.add(systemGrid, layoutConstraints);
+        healthBarsPanel = new HealthBarsPanel();
+        healthBarsPanel.initializeHealthBarsPanel();
+//        healthBarsPanel.setLayout(new GridLayout(1, 2));
 
-        // Second row (History panel and options panel)
-        layoutConstraints.gridx = 0;
-        layoutConstraints.gridy = 1;
-        layoutConstraints.fill = GridBagConstraints.BOTH;
-        main.add(eventPanel, layoutConstraints);
-        layoutConstraints.gridx = 1;
-        main.add(optionsPanel, layoutConstraints);
+        JPanel gridsPanel = new JPanel();
+        gridsPanel.setLayout(new GridLayout(1, 2));
+        gridsPanel.add(playerGrid);
+        gridsPanel.add(systemGrid);
+
+        JPanel optionsPanelWrapper = new JPanel();
+        optionsPanelWrapper.setLayout(new BoxLayout(optionsPanelWrapper, BoxLayout.Y_AXIS));
+        optionsPanelWrapper.setPreferredSize(new Dimension(w + 50, (int) (MAIN_WINDOW_HEIGHT * 0.15)));
+        optionsPanelWrapper.add(optionsPanel);
+        optionsPanelWrapper.add(Box.createVerticalStrut(0));
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(gridsPanel, BorderLayout.CENTER);
+        mainPanel.add(healthBarsPanel, BorderLayout.SOUTH);
+
+        main.add(mainPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(eventPanel, BorderLayout.CENTER);
+        bottomPanel.add(optionsPanelWrapper, BorderLayout.EAST);
+
+        main.add(mainPanel, BorderLayout.CENTER);
+        main.add(bottomPanel, BorderLayout.SOUTH);
 
         main.pack();
         main.setLocationRelativeTo(null);
@@ -146,9 +158,17 @@ public class MainPanel extends JFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof BoardState) {
-            System.out.println("[DEBUG] GameState has changed, refreshing grids");
-            BoardState boardState = (BoardState) o;
-            GameState gameState = controller.getGameState();
+            final BoardState boardState = (BoardState) o;
+            final GameState gameState = controller.getGameState();
+            System.out.printf("[DEBUG] %s GameState has changed, refreshing grids%n",
+                    boardState.isPlayer() ? "Player" : "System");
+
+
+            if(gameState.getStatus() == GameStatus.IN_PROGRESS || gameState.getStatus() == GameStatus.GAME_OVER )
+                healthBarsPanel.updateHealthBars(boardState);
+            else
+                healthBarsPanel.initializeHealthBarsPanel();
+
             if (boardState.isPlayer()) {
                 playerGrid.initializePanel(gameState, boardState);
                 optionsPanel.initializePanel(controller.getDesignState());
@@ -163,6 +183,7 @@ public class MainPanel extends JFrame implements Observer {
             systemGrid.initializePanel(gameState, systemBoardState);
 
             if(gameState.hasLocaleChanged()){
+                this.setTitle(Utils.getLocalizedString("title_bar"));
                 eventPanel.initializePanel();
                 optionsPanel.initializePanel(controller.getDesignState());
                 initializeMenuBar();
@@ -170,19 +191,7 @@ public class MainPanel extends JFrame implements Observer {
             }
 
             if ((gameState.getStatus() == GameStatus.GAME_OVER)) {
-                int userChoice = JOptionPane.showConfirmDialog(getContentPane(),
-                        String.format(Utils.getLocalizedString("game_over"),
-                                gameState.didPlayerWin() ? Utils.getLocalizedString("player") : Utils.getLocalizedString("system"),
-                                systemBoardState.getTotalHitPoints() - systemBoardState.getHitPointsRemaining(),
-                                playerBoardState.getTotalHitPoints() - playerBoardState.getHitPointsRemaining())
-                                + "\n" + String.format(Utils.getLocalizedString("win_loss"), gameState.getPlayerGamesWon(), gameState.getSystemGamesWon())
-                                + "\n" + Utils.getLocalizedString("game_over_restart"),
-                        Utils.getLocalizedString("new_game_title"), JOptionPane.YES_NO_OPTION);
-                if (userChoice == JOptionPane.YES_OPTION) {
-                    controller.newGame();
-                } else{
-                    exit(0);
-                }
+                SplashScreens.displayGameOverSplashScreen(controller, gameState, playerBoardState, systemBoardState);
             }
         }
 
@@ -214,17 +223,20 @@ public class MainPanel extends JFrame implements Observer {
      * Sets the look and feel of the game to match the operating system and it's settings that it's running on
      */
     private void setLookAndFeel() {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        /*  look and feel was causing issues with text on buttons, i.e. boat sizes as '...'
+        *   using default look and feel to fix this, even if it's a little ugly */
+//
+//        SwingUtilities.invokeLater(() -> {
+//            try {
+//                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//                    if ("Nimbus".equals(info.getName())) {
+//                        UIManager.setLookAndFeel(info.getClassName());
+//                        break;
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 }

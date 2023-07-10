@@ -31,6 +31,7 @@ public class EventPanel extends JPanel {
         textArea = new JTextArea(0, 0);
         textArea.setEditable(false);
         final JScrollPane scroll = new JScrollPane(textArea);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         final Border scrollBorderTitle = BorderFactory.createTitledBorder(Utils.getLocalizedString("game_history"));
         scroll.setBorder(scrollBorderTitle);

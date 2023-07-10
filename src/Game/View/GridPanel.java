@@ -48,7 +48,7 @@ public class GridPanel extends JPanel {
         removeAll();
         setLayout(new GridLayout(0, dimension + 1, 2, 2));
         final JLabel emptyCornerLabel = new JLabel();
-        emptyCornerLabel.setPreferredSize(new Dimension(15, 15));
+        emptyCornerLabel.setPreferredSize(new Dimension(5, 5));
         add(emptyCornerLabel);
 
         for (int col = 0; col < dimension; col++) {
@@ -70,7 +70,6 @@ public class GridPanel extends JPanel {
                 final GridSquare gridSquare = boardState.getGridSquare(row, col);
                 final GridButton gridButton = new GridButton(new Point(row, col));
 
-                gridButton.setMargin(new Insets(0, 0, 0, 0));
                 gridButton.addActionListener(e -> {
                     final int x = (int) gridButton.getCoordinates().getX();
                     final int y = (int) gridButton.getCoordinates().getY();
@@ -85,6 +84,8 @@ public class GridPanel extends JPanel {
                 if (gridSquare != null) {
                     if (isPlayer && gridSquare.getStatus() == GridSquareStatus.ALIVE || gameStatus == GameStatus.GAME_OVER) {
                         gridButton.setText(Integer.toString(gridSquare.getShipSize()));
+//                        gridButton.setFont(new Font("Arial", Font.PLAIN, 6));
+                        gridButton.setMargin(new Insets(0, 0, 0, 0));
                         gridButton.setBackground(Color.gray);
                         gridButton.setOpaque(true);
                     } else if (gridSquare.getStatus() == GridSquareStatus.HIT) {
@@ -130,9 +131,6 @@ public class GridPanel extends JPanel {
          * @param coordinates (x,y) coordinates corresponding to the game board
          */
         public GridButton(final Point coordinates) {
-            /**
-             * Indicates whether button belongs to human player (true) or system (false)
-             */
             this.coordinates = coordinates;
         }
 
