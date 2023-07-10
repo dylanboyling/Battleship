@@ -3,14 +3,12 @@ package Game.View;
 import Game.Controller.BattleshipController;
 import Game.Model.DesignState;
 import Game.Model.Enums.GameStatus;
-import Game.Util.Constants;
 import Game.Util.Utils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Creates the options panel for the Battleship game
@@ -48,15 +46,25 @@ public class OptionsPanel extends JPanel {
      */
     public void initializePanel(final DesignState designState) {
         removeAll();
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new GridBagLayout());
 
-        JPanel configPanel = initializeConfigurationPanel();
-        add(configPanel);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        JPanel configPanel = initializeConfigPanel();
+        add(configPanel, gbc);
 
         if (controller.getGameState().getStatus() == GameStatus.DESIGN) {
+            gbc.gridy = 1;
             JPanel designPanel = initializeDesignPanel(designState);
-            add(designPanel);
+            add(designPanel, gbc);
         }
+
+        // TODO if game is in progress, replace design window with a timer
     }
 
     /**
@@ -64,20 +72,11 @@ public class OptionsPanel extends JPanel {
      *
      * @return Configuration panel
      */
-    private JPanel initializeConfigurationPanel() {
-        // TODO make buttons look better i.e. not so small and make centered
+    private JPanel initializeConfigPanel() {
+        System.out.println("hello");
         final GameStatus gameStatus = controller.getGameState().getStatus();
         final JPanel configPanel = new JPanel();
         configPanel.setLayout(new GridBagLayout());
-        GridBagConstraints layoutConstraints = new GridBagConstraints();
-
-        final JLabel languageLabel = new JLabel(Utils.getLocalizedString("language"));
-        final JComboBox<Locale> languages = new JComboBox<>(Constants.supportedLocales);
-        languages.addActionListener(e -> {
-            System.out.printf("[DEBUG] Language was changed to %s%n", languages.getSelectedItem());
-            controller.changeLanguage((Locale) languages.getSelectedItem());
-        });
-        languages.setSelectedItem(Locale.getDefault());
 
         final JLabel dimensionLabel = new JLabel(Utils.getLocalizedString("dimensions"));
         final JComboBox<String> dimensions = new JComboBox<>(DIMENSION_OPTIONS);
@@ -117,27 +116,19 @@ public class OptionsPanel extends JPanel {
         }
 
         final Box firstRow = Box.createHorizontalBox();
-        firstRow.add(languageLabel);
-        firstRow.add(languages);
-        firstRow.add(Box.createRigidArea(new Dimension(50, 0)));
+        firstRow.add(Box.createRigidArea(new Dimension(25, 0)));
         firstRow.add(randomizeShips);
-        firstRow.add(Box.createRigidArea(new Dimension(50, 0)));
+        firstRow.add(Box.createRigidArea(new Dimension(10, 0)));
+        firstRow.add(designShips);
+        firstRow.add(Box.createRigidArea(new Dimension(10, 0)));
+        firstRow.add(dimensionLabel);
+        firstRow.add(dimensions);
+        firstRow.add(Box.createRigidArea(new Dimension(10, 0)));
         firstRow.add(resetButton);
+        firstRow.add(Box.createRigidArea(new Dimension(10, 0)));
+        firstRow.add(playButton);
 
-        layoutConstraints.gridx = 0;
-        layoutConstraints.gridy = 0;
-        layoutConstraints.insets = new Insets(0, 0, 25, 0);
-        configPanel.add(firstRow, layoutConstraints);
-
-        final Box secondRow = Box.createHorizontalBox();
-        secondRow.add(dimensionLabel);
-        secondRow.add(dimensions);
-        secondRow.add(Box.createRigidArea(new Dimension(50, 0)));
-        secondRow.add(designShips);
-        secondRow.add(Box.createRigidArea(new Dimension(50, 0)));
-        secondRow.add(playButton);
-        layoutConstraints.gridy = 1;
-        configPanel.add(secondRow, layoutConstraints);
+        configPanel.add(firstRow);
 
         Border optionsBorder = BorderFactory.createTitledBorder(Utils.getLocalizedString("options"));
         configPanel.setBorder(optionsBorder);
@@ -153,11 +144,13 @@ public class OptionsPanel extends JPanel {
      */
     private JPanel initializeDesignPanel(DesignState designState) {
         final JPanel designPanel = new JPanel();
-        designPanel.setLayout(new BoxLayout(designPanel, BoxLayout.X_AXIS));
+        designPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        designPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
 
         final JLabel boatSizeLabel = new JLabel(Utils.getLocalizedString("boat_size"));
-        ArrayList<Integer> boatSizeOptions = (ArrayList<Integer>) controller.getBoatSizeOptions();
-        Integer[] sizeOptions = boatSizeOptions.toArray(new Integer[boatSizeOptions.size()]);
+        final ArrayList<Integer> boatSizeOptions = (ArrayList<Integer>) controller.getBoatSizeOptions();
+        final Integer[] sizeOptions = boatSizeOptions.toArray(new Integer[boatSizeOptions.size()]);
         final JComboBox<Integer> boatSizes = new JComboBox<>(sizeOptions);
 
         final JLabel boatCountRemaining = new JLabel(String.format(Utils.getLocalizedString("boats_remaining"),
@@ -174,12 +167,9 @@ public class OptionsPanel extends JPanel {
         else
             boatSizes.setSelectedIndex(0);
 
-        designPanel.add(Box.createRigidArea(new Dimension(25, 0)));
         designPanel.add(boatSizeLabel);
         designPanel.add(boatSizes);
-        designPanel.add(Box.createRigidArea(new Dimension(15, 0)));
         designPanel.add(boatCountRemaining);
-        designPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 
         final JLabel directionLabel = new JLabel(Utils.getLocalizedString("boat_direction"));
         final JRadioButton horizontalButton = new JRadioButton(Utils.getLocalizedString("horizontal"));
@@ -196,7 +186,11 @@ public class OptionsPanel extends JPanel {
         });
         directionButtons.add(horizontalButton);
         directionButtons.add(verticalButton);
-        horizontalButton.setSelected(true);
+
+        if(designState.getIsHorizontal())
+            horizontalButton.setSelected(true);
+        else
+            verticalButton.setSelected(true);
 
         final JButton clearButton = new JButton(Utils.getLocalizedString("clear_board"));
         clearButton.addActionListener(e -> {
@@ -207,10 +201,10 @@ public class OptionsPanel extends JPanel {
         designPanel.add(directionLabel);
         designPanel.add(horizontalButton);
         designPanel.add(verticalButton);
-        designPanel.add(Box.createRigidArea(new Dimension(50, 0)));
+        designPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         designPanel.add(clearButton);
 
-        designPanel.add(Box.createRigidArea(new Dimension(25, 0)));
+        designPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         Border designBorder = BorderFactory.createTitledBorder(Utils.getLocalizedString("design"));
         designPanel.setBorder(designBorder);
 

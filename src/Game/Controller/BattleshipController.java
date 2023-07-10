@@ -104,7 +104,7 @@ public class BattleshipController {
         if (gameState.getStatus() == GameStatus.DESIGN && isPlayersBoard) {
             placeShip(x, y);
         } else if (gameState.getStatus() == GameStatus.IN_PROGRESS && !isPlayersBoard && gameState.isPlayersTurn()) {
-            validateGuess(isPlayersBoard, x, y);
+            validateGuess(false, x, y);
         }
     }
 
@@ -126,7 +126,6 @@ public class BattleshipController {
         if (playerBoardState.placeShipOnBoard(y, x, boatSize, isHorizontal)) {
             mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("boat_created"),
                     boatSize, Utils.getLetterCoordinate(x), y + 1));
-            designState.setIsHorizontal(true);
         } else {
             mainWindow.updateLogPanel(String.format(Utils.getLocalizedString("boat_not_created"),
                     boatSize, Utils.getLetterCoordinate(x), y + 1));
