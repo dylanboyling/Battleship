@@ -1,9 +1,12 @@
 package Game.View;
 
 import Game.Controller.BattleshipController;
+import Game.Util.Constants;
 import Game.Util.Utils;
 
 import javax.swing.*;
+
+import java.util.Locale;
 
 import static java.lang.System.exit;
 
@@ -48,9 +51,22 @@ public class MenuBar extends JMenuBar {
             }
         });
 
+        JMenuItem languageMenu = new JMenu(Utils.getLocalizedString("language"));
+        for(Locale locale : Constants.supportedLocales){
+            System.out.println(locale);
+            final JMenuItem languageOption = new JMenuItem(String.valueOf(locale));
+            languageOption.addActionListener(e->{
+                controller.changeLanguage(locale);
+                System.out.println(languageOption.getLocale());
+            });
+            languageMenu.add(languageOption);
+        }
+
         JMenu gameMenu = new JMenu(Utils.getLocalizedString("game"));
         gameMenu.add(newGameMenuItem);
         gameMenu.add(solutionMenuItem);
+        gameMenu.addSeparator();
+        gameMenu.add(languageMenu);
         gameMenu.addSeparator();
         gameMenu.add(exitMenuItem);
 
@@ -60,7 +76,7 @@ public class MenuBar extends JMenuBar {
         });
         JMenuItem aboutMenuItem = new JMenuItem(Utils.getLocalizedString("about"));
         aboutMenuItem.addActionListener(e -> {
-            JOptionPane.showMessageDialog(parentFrame, Utils.getLocalizedString("about_msg"));
+            SplashScreens.displayAboutSplashScreen();
         });
 
         JMenu helpMenu = new JMenu(Utils.getLocalizedString("help"));
