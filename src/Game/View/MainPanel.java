@@ -7,14 +7,10 @@ import Game.Model.Enums.GameStatus;
 import Game.Model.GameState;
 import Game.Util.Utils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.InputStream;
 import java.util.Observable;
 import java.util.Observer;
-
-import static java.lang.System.exit;
 
 /**
  * This class creates and initializes the main panel which includes the game boards, event log, and options menu
@@ -29,12 +25,12 @@ public class MainPanel extends JFrame implements Observer {
     /**
      * Width of the main window
      */
-    public static final int MAIN_WINDOW_WIDTH = 1100;
+    public static final int MAIN_WINDOW_WIDTH = 1200;
 
     /**
      * Height of the main window
      */
-    public static final int MAIN_WINDOW_HEIGHT = 800;
+    public static final int MAIN_WINDOW_HEIGHT = 900;
 
     /**
      * Main frame which contains all UI elements
@@ -167,8 +163,11 @@ public class MainPanel extends JFrame implements Observer {
             System.out.printf("[DEBUG] %s GameState has changed, refreshing grids%n",
                     boardState.isPlayer() ? "Player" : "System");
 
+
             if(gameState.getStatus() == GameStatus.IN_PROGRESS || gameState.getStatus() == GameStatus.GAME_OVER )
                 healthBarsPanel.updateHealthBars(boardState);
+            else
+                healthBarsPanel.initializeHealthBarsPanel();
 
             if (boardState.isPlayer()) {
                 playerGrid.initializePanel(gameState, boardState);

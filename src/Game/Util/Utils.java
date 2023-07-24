@@ -23,7 +23,7 @@ public class Utils {
      * @return Localized message that will be displayed to the user
      */
     public static String getLocalizedString(final String message) {
-        ResourceBundle bundle = ResourceBundle.getBundle("Battleship");
+        ResourceBundle bundle = ResourceBundle.getBundle("res/Battleship");
         return bundle.getString(message);
     }
 }
