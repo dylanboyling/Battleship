@@ -23,17 +23,15 @@ public class HealthBarsPanel extends JPanel {
     private JProgressBar systemHealthBar;
 
     public void initializeHealthBarsPanel(){
+        removeAll();
         playerHealthBar = new JProgressBar(0, 100);
         playerHealthBar.setStringPainted(true);
         playerHealthBar.setValue(100);
-//        playerHealthBar.setPreferredSize(new Dimension(w / 2, (int) (MAIN_WINDOW_HEIGHT *0.03)));
 
         systemHealthBar = new JProgressBar(0, 100);
         systemHealthBar.setStringPainted(true);
         systemHealthBar.setValue(100);
-//        systemHealthBar.setPreferredSize(new Dimension(w / 2, (int) (MAIN_WINDOW_HEIGHT * 0.03)));
 
-//        JPanel healthBarsPanel = new JPanel();
         setLayout(new GridLayout(1, 2));
         add(playerHealthBar);
         add(systemHealthBar);

@@ -1,4 +1,0 @@
-src\Game\View\HealthBarsPanel.java:9: warning: [serial] serializable class HealthBarsPanel has no definition of serialVersionUID
-public class HealthBarsPanel extends JPanel {
-       ^
-1 warning
