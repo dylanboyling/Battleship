@@ -1,0 +1,10 @@
+src\Game\ClientServer\Client\Client.java:25: warning: [deprecation] Observable in java.util has been deprecated
+public class Client extends Observable {
+                            ^
+src\Game\ClientServer\Client\ClientPanel.java:20: warning: [deprecation] Observer in java.util has been deprecated
+public class ClientPanel implements Observer {
+                                    ^
+src\Game\ClientServer\Client\ClientPanel.java:292: warning: [deprecation] Observable in java.util has been deprecated
+    public void update(Observable o, Object arg) {
+                       ^
+3 warnings

@@ -1,6 +1,10 @@
 Game
-Game.Controller
-Game.Model
-Game.Model.Enums
+Game.BattleshipMVC
+Game.BattleshipMVC.Controller
+Game.BattleshipMVC.Model
+Game.BattleshipMVC.Model.Enums
+Game.BattleshipMVC.View
+Game.ClientServer
+Game.ClientServer.Client
+Game.ClientServer.Server
 Game.Util
-Game.View

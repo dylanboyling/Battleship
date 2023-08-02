@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"Game"},{"l":"Game.Controller"},{"l":"Game.Model"},{"l":"Game.Model.Enums"},{"l":"Game.Util"},{"l":"Game.View"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"Game"},{"l":"Game.BattleshipMVC"},{"l":"Game.BattleshipMVC.Controller"},{"l":"Game.BattleshipMVC.Model"},{"l":"Game.BattleshipMVC.Model.Enums"},{"l":"Game.BattleshipMVC.View"},{"l":"Game.ClientServer"},{"l":"Game.ClientServer.Client"},{"l":"Game.ClientServer.Server"},{"l":"Game.Util"}]

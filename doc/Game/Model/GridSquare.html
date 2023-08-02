@@ -116,7 +116,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">Game.Model</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">Game.BattleshipMVC.Model</a></div>
 <h2 title="Class GridSquare" class="title">Class GridSquare</h2>
 </div>
 <div class="contentContainer">
@@ -124,7 +124,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>Game.Model.GridSquare</li>
+<li>Game.BattleshipMVC.Model.GridSquare</li>
 </ul>
 </li>
 </ul>
@@ -155,10 +155,10 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(Game.Model.GridBoat,int,boolean,Game.Model.Enums.GridSquareStatus)">GridSquare</a></span>&#8203;(<a href="GridBoat.html" title="class in Game.Model">GridBoat</a>&nbsp;gridBoat,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(Game.Model.GridBoat,int,boolean,Game.Model.Enums.GridSquareStatus)">GridSquare</a></span>&#8203;(<a href="GridBoat.html" title="class in Game.BattleshipMVC.Model">GridBoat</a>&nbsp;gridBoat,
           int&nbsp;shipSize,
           boolean&nbsp;isPlayer,
-          <a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a>&nbsp;status)</code></th>
+          <a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a>&nbsp;status)</code></th>
 <td class="colLast">
 <div class="block">Creates a new grid square for the Battleship board</div>
 </td>
@@ -182,7 +182,7 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="GridBoat.html" title="class in Game.Model">GridBoat</a></code></td>
+<td class="colFirst"><code><a href="GridBoat.html" title="class in Game.BattleshipMVC.Model">GridBoat</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGridBoat()">getGridBoat</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the grid boat that this square belongs to</div>
@@ -196,7 +196,7 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a></code></td>
+<td class="colFirst"><code><a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStatus()">getStatus</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the status of the ship part at this location.</div>
@@ -211,7 +211,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setStatus(Game.Model.Enums.GridSquareStatus)">setStatus</a></span>&#8203;(<a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a>&nbsp;status)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setStatus(Game.Model.Enums.GridSquareStatus)">setStatus</a></span>&#8203;(<a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a>&nbsp;status)</code></th>
 <td class="colLast">
 <div class="block">Changes the status of the grid square</div>
 </td>
@@ -246,10 +246,10 @@ extends java.lang.Object</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GridSquare</h4>
-<pre>public&nbsp;GridSquare&#8203;(<a href="GridBoat.html" title="class in Game.Model">GridBoat</a>&nbsp;gridBoat,
+<pre>public&nbsp;GridSquare&#8203;(<a href="GridBoat.html" title="class in Game.BattleshipMVC.Model">GridBoat</a>&nbsp;gridBoat,
                   int&nbsp;shipSize,
                   boolean&nbsp;isPlayer,
-                  <a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a>&nbsp;status)</pre>
+                  <a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a>&nbsp;status)</pre>
 <div class="block">Creates a new grid square for the Battleship board</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -290,7 +290,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getStatus</h4>
-<pre class="methodSignature">public&nbsp;<a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a>&nbsp;getStatus()</pre>
+<pre class="methodSignature">public&nbsp;<a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a>&nbsp;getStatus()</pre>
 <div class="block">Returns the status of the ship part at this location. True if it is alive and false otherwise</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -304,7 +304,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>setStatus</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;setStatus&#8203;(<a href="Enums/GridSquareStatus.html" title="enum in Game.Model.Enums">GridSquareStatus</a>&nbsp;status)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;setStatus&#8203;(<a href="Enums/GridSquareStatus.html" title="enum in Game.BattleshipMVC.Model.Enums">GridSquareStatus</a>&nbsp;status)</pre>
 <div class="block">Changes the status of the grid square</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -332,7 +332,7 @@ extends java.lang.Object</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getGridBoat</h4>
-<pre class="methodSignature">public&nbsp;<a href="GridBoat.html" title="class in Game.Model">GridBoat</a>&nbsp;getGridBoat()</pre>
+<pre class="methodSignature">public&nbsp;<a href="GridBoat.html" title="class in Game.BattleshipMVC.Model">GridBoat</a>&nbsp;getGridBoat()</pre>
 <div class="block">Returns the grid boat that this square belongs to</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>

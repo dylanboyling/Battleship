@@ -19,8 +19,12 @@ SET JARERR=jap-jar.err
 SET DOCDIR=doc
 SET DOCPACK=Game
 SET DOCERR=jap-javadoc.err
-SET MAINCLASSSRC=src/Game/Controller/Battleship.java
-SET MAINCLASSBIN=Game.Controller.Battleship
+:: ran batch once for server, once for client to generate the jars
+:: only javadoc errors were 3 deprecation warnings for using Observable 
+:: SET MAINCLASSSRC=src/Game/ClientServer/Server/Server.java
+:: SET MAINCLASSBIN=Game.ClientServer.Server.Server
+SET MAINCLASSSRC=src/Game/ClientServer/Client/Client.java
+SET MAINCLASSBIN=Game.ClientServer.Client.Client
 SET IMAGES=images
 SET RESOURCES=res
 

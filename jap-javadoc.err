@@ -1,0 +1,3 @@
+src\Game\ClientServer\Server\ClientHandler.java:57: warning: no @param for serverPanel
+    public ClientHandler(final Server server, final Socket clientSocket, final int clientId, final ServerPanel serverPanel) {
+           ^
